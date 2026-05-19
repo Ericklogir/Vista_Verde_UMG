@@ -6,6 +6,10 @@ package proyectofinalvistaverde;
 
 import javax.swing.*;
 import java.awt.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  *
@@ -50,20 +54,47 @@ public class Login extends javax.swing.JPanel {
         gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 2;
         add(btnIngresar, gbc);
 
-        btnIngresar.addActionListener(e -> {
-            String Usuario = txtUsuario.getText();
-            String Contraseña = new String(txtContraseña.getPassword());
-                
-                if (Usuario.equals("iusr_vistaverde") && Contraseña.equals("R3sidencial2026%")) {
-                JOptionPane.showMessageDialog(this, "Bienvenido!");
-                
-                framePrincipal.cambiarPantalla("Inicio");
-                
-            } else {
-              
-                JOptionPane.showMessageDialog(this, "Usuario o contraseña incorrectos", "Error de Autenticación", JOptionPane.ERROR_MESSAGE);
-            }
-        });
+        //FUNCION DEL BOTON INGRESAR CON BASE DE DATOS LOGIN
+    btnIngresar.addActionListener(e -> {
+
+    String usuario = txtUsuario.getText().trim();
+    String contrasena = new String(txtContraseña.getPassword()).trim();
+
+    if (usuario.isEmpty() || contrasena.isEmpty()) {
+
+        JOptionPane.showMessageDialog(this,"Complete todos los campos");
+        return;
+    }
+
+    try (Connection con = Conexion.getConexion()) {
+
+        String sql ="SELECT * FROM login " + "WHERE usuario = ? AND contrasena = ?";
+
+        PreparedStatement ps = con.prepareStatement(sql);
+
+        ps.setString(1, usuario);
+        ps.setString(2, contrasena);
+
+        ResultSet rs = ps.executeQuery();
+
+        if (rs.next()) {
+
+            JOptionPane.showMessageDialog(this,"Bienvenido al sistema");
+            framePrincipal.cambiarPantalla("Inicio");
+
+        } else {
+
+            JOptionPane.showMessageDialog(this,"Usuario o contraseña incorrectos","Error de autenticación",
+                    JOptionPane.ERROR_MESSAGE);
+
+            txtContraseña.setText("");
+        }
+
+    } catch (SQLException ex) {
+
+        JOptionPane.showMessageDialog(this,"Error en base de datos:\n" + ex.getMessage());
+    }
+});
     }
     /**
      * This method is called from within the constructor to initialize the form.
