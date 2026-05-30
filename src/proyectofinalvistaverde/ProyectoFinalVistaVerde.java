@@ -1,49 +1,63 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
- */
 package proyectofinalvistaverde;
-    
+
 import javax.swing.*;
 import java.awt.*;
-/**
- *
- * @author PC
- */
-public class ProyectoFinalVistaVerde extends JFrame{
+
+
+public class ProyectoFinalVistaVerde extends JFrame {
+
     private CardLayout cardLayout;
     private JPanel contenedorPrincipal;
-    
+
     public ProyectoFinalVistaVerde() {
-        setTitle("Sistema de Administración de Condominio Vista Verde");
-        setSize(900, 700);
+        setTitle("Sistema de Administración — Condominio Vista Verde");
+        setSize(1000, 700);
+        setMinimumSize(new Dimension(800, 560));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-    
+
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception ignored) {}
+
         cardLayout = new CardLayout();
         contenedorPrincipal = new JPanel(cardLayout);
 
-        Login login = new Login(this);
-        contenedorPrincipal.add(login, "Login");
-        Inicio inicio = new Inicio(this);
-        contenedorPrincipal.add(inicio, "Inicio");
-        RegistroP registrop = new RegistroP(this);
-        contenedorPrincipal.add(registrop, "Registro Propietarios");
-        RegistroPC registropc = new RegistroPC(this);
-        contenedorPrincipal.add(registropc, "Registro Pago Cuotas");
-      add(contenedorPrincipal);
+        contenedorPrincipal.add(new Login(this),         "Login");
+        contenedorPrincipal.add(new Inicio(this),        "Inicio");
+        contenedorPrincipal.add(new RegistroP(this),     "Registro Propietarios");
+        contenedorPrincipal.add(new RegistroPC(this),    "Registro Pagos");
+        contenedorPrincipal.add(new ConfiguracionC(this),"Configuracion Cuenta");
+        contenedorPrincipal.add(new EstadoCC(this),      "Estado Cuenta");
+        contenedorPrincipal.add(new ReporteG(this),      "Reporte General");
+        contenedorPrincipal.add(new CasasM(this),        "Casas Morosas");
+
+        add(contenedorPrincipal);
         setVisible(true);
     }
-    
-    public void cambiarPantalla(String nombrePantalla) {
-        cardLayout.show(contenedorPrincipal, nombrePantalla);
+
+   public void cambiarPantalla(String nombre) {
+
+    Component[] componentes =
+            contenedorPrincipal.getComponents();
+
+    for(Component c : componentes) {
+
+        if(c instanceof RegistroPC
+                && nombre.equals("Registro Pagos")) {
+
+            ((RegistroPC) c)
+                    .actualizarCuotaVista();
+        }
     }
-    /**
-     * @param args the command line arguments
-     */
+
+    cardLayout.show(
+            contenedorPrincipal,
+            nombre
+    );
+}
+
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            new ProyectoFinalVistaVerde();
-        });    // TODO code application logic here
+        SwingUtilities.invokeLater(ProyectoFinalVistaVerde::new);
     }
 }
